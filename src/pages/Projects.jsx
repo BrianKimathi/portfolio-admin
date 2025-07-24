@@ -13,6 +13,8 @@ const initialForm = {
   images: [],
 };
 
+const PROJECT_IMAGE_BASE = 'https://portfolio-backend-x6q9.onrender.com';
+
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [form, setForm] = useState(initialForm);
@@ -21,18 +23,19 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
 
+  const loadProjects = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchProjects();
+      setProjects(data);
+    } catch (err) {
+      setError("Failed to load projects");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadProjects = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchProjects();
-        setProjects(data);
-      } catch (err) {
-        setError("Failed to load projects");
-      } finally {
-        setLoading(false);
-      }
-    };
     loadProjects();
   }, []);
 
@@ -94,13 +97,26 @@ const Projects = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this project?')) return;
-    await deleteProject(id);
-    loadProjects();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await deleteProject(id);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        loadProjects();
+      }
+    } catch (err) {
+      setError('Failed to delete project.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-full max-w-full p-2 sm:p-4 md:p-6 lg:p-8 xl:p-10 2xl:p-12">
       <h2 className="text-3xl font-extrabold mb-8 text-blue-700">Manage Projects</h2>
+      {error && <div className="text-red-500 text-sm text-center mb-4">{error}</div>}
       <button
         onClick={() => { setShowForm((v) => !v); setEditId(null); setForm(initialForm); }}
         className="mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-2 rounded shadow-lg font-semibold"
@@ -140,7 +156,7 @@ const Projects = () => {
           <li key={project.id} className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl shadow-xl p-6 flex flex-col gap-3 border border-blue-200 hover:shadow-2xl transition-shadow">
             <div className="flex items-center gap-2 flex-wrap mb-2">
               {project.images && project.images.map((url, idx) => (
-                <img key={idx} src={getImageUrl(url)} alt="project" className="w-16 h-16 object-cover rounded-lg border-2 border-blue-300" />
+                <img key={idx} src={url.startsWith('http') ? url : PROJECT_IMAGE_BASE + url} alt="project" className="w-16 h-16 object-cover rounded-lg border-2 border-blue-300" />
               ))}
             </div>
             <div className="font-bold text-xl text-blue-800">{project.title}</div>

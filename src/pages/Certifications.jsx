@@ -12,6 +12,8 @@ const initialForm = {
   certificate_url: '',
 };
 
+const CERT_IMAGE_BASE = 'https://portfolio-backend-x6q9.onrender.com';
+
 const Certifications = () => {
   const [certs, setCerts] = useState([]);
   const [form, setForm] = useState(initialForm);
@@ -21,18 +23,19 @@ const Certifications = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const loadCerts = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchCertifications();
+      setCerts(data);
+    } catch (err) {
+      setError("Failed to load certifications");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadCerts = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchCertifications();
-        setCerts(data);
-      } catch (err) {
-        setError("Failed to load certifications");
-      } finally {
-        setLoading(false);
-      }
-    };
     loadCerts();
   }, []);
 
@@ -85,8 +88,20 @@ const Certifications = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this certification?')) return;
-    await deleteCertification(id);
-    loadCerts();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await deleteCertification(id);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        loadCerts();
+      }
+    } catch (err) {
+      setError('Failed to delete certification.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -133,7 +148,7 @@ const Certifications = () => {
             <div className="text-xs text-gray-500">Active: {cert.is_active ? 'Yes' : 'No'}</div>
             <div className="text-gray-700">{cert.description}</div>
             {cert.certificate_url && (
-              <a href={`http://localhost:5000${cert.certificate_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline mt-1">View Certificate</a>
+              <a href={cert.certificate_url.startsWith('http') ? cert.certificate_url : CERT_IMAGE_BASE + cert.certificate_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline mt-1">View Certificate</a>
             )}
             <div className="flex gap-2 mt-2">
               <button onClick={() => handleEdit(cert)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded shadow">Edit</button>

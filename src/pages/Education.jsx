@@ -83,8 +83,20 @@ const Education = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this education?')) return;
-    await deleteEducation(id);
-    loadEducation();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await deleteEducation(id);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        loadEducation();
+      }
+    } catch (err) {
+      setError('Failed to delete education.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

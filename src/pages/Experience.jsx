@@ -121,17 +121,17 @@ const Experience = () => {
   const [refs, setRefs] = useState({});
   const [referee, setReferee] = useState(initialReferee);
 
-  const loadExperience = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchExperience();
-      setExperience(data);
-    } catch (err) {
-      setError("Failed to load experience");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadExperience = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchExperience();
+        setExperience(data);
+      } catch (err) {
+        setError("Failed to load experience");
+      } finally {
+        setLoading(false);
+      }
+    };
 
   const loadReferences = async (expId) => {
     const data = await fetchReferences(expId);
@@ -196,8 +196,20 @@ const Experience = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this experience?')) return;
-    await deleteExperience(id);
-    loadExperience();
+    setError('');
+    setLoading(true);
+    try {
+      const res = await deleteExperience(id);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        loadExperience();
+      }
+    } catch (err) {
+      setError('Failed to delete experience.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddRef = (expId) => setRefForms(f => ({ ...f, [expId]: null }));
@@ -452,4 +464,4 @@ const Experience = () => {
   );
 };
 
-export default Experience;
+export default Experience; 
