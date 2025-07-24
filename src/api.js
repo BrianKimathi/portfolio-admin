@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'https://portfolio-backend-x6q9.onrender.com/api';
+const API_URL = 'https://portfolio-backend-x6q9.onrender.com/api';
 
 // Helper to get token from localStorage
 function getToken() {
@@ -246,6 +246,36 @@ export async function updateProfile(data) {
     method: 'PUT',
     headers: { 'Authorization': `Bearer ${getToken()}` },
     body: formData
+  });
+  return res.json();
+}
+
+export async function fetchReferences(expId) {
+  const res = await fetch(`${API_URL}/experience/${expId}/references`, {
+    headers: { 'Authorization': `Bearer ${getToken()}` }
+  });
+  return res.json();
+}
+export async function createReference(expId, data) {
+  const res = await fetch(`${API_URL}/experience/${expId}/references`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+export async function updateReference(refId, data) {
+  const res = await fetch(`${API_URL}/references/${refId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+export async function deleteReference(refId) {
+  const res = await fetch(`${API_URL}/references/${refId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${getToken()}` }
   });
   return res.json();
 }

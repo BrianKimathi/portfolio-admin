@@ -22,18 +22,19 @@ const Education = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const loadEducation = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchEducation();
+      setEducation(data);
+    } catch (err) {
+      setError("Failed to load education");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadEducation = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchEducation();
-        setEducation(data);
-      } catch (err) {
-        setError("Failed to load education");
-      } finally {
-        setLoading(false);
-      }
-    };
     loadEducation();
   }, []);
 
