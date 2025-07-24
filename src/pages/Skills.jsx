@@ -15,13 +15,33 @@ const Certifications = () => {
   const [form, setForm] = useState(initialForm);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    const loadCerts = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchCertifications();
+        setCerts(data);
+      } catch (err) {
+        setError("Failed to load certifications");
+      } finally {
+        setLoading(false);
+      }
+    };
     loadCerts();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading certifications...</div>
+      </div>
+    );
+  }
 
   const loadCerts = async () => {
     const data = await fetchCertifications();

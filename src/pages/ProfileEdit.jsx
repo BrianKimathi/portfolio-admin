@@ -19,15 +19,33 @@ const initialProfile = {
 
 const ProfileEdit = () => {
   const [profile, setProfile] = useState(initialProfile);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchProfile().then((data) => {
-      setProfile((prev) => ({ ...prev, ...data, cv: null }));
-    });
+    const loadProfile = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchProfile();
+        setProfile((prev) => ({ ...prev, ...data, cv: null }));
+      } catch (err) {
+        setError("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProfile();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading profile...</div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;

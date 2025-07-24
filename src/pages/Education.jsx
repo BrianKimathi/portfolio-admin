@@ -18,18 +18,33 @@ const Education = () => {
   const [form, setForm] = useState(initialForm);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    const loadEducation = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchEducation();
+        setEducation(data);
+      } catch (err) {
+        setError("Failed to load education");
+      } finally {
+        setLoading(false);
+      }
+    };
     loadEducation();
   }, []);
 
-  const loadEducation = async () => {
-    const data = await fetchEducation();
-    setEducation(data);
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading education...</div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

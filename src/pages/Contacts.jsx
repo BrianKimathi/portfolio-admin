@@ -3,18 +3,33 @@ import { fetchContacts, markContactRead, deleteContact } from '../api';
 
 const Contacts = () => {
   const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    const loadContacts = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchContacts();
+        setContacts(data);
+      } catch (err) {
+        setError("Failed to load contacts");
+      } finally {
+        setLoading(false);
+      }
+    };
     loadContacts();
   }, []);
 
-  const loadContacts = async () => {
-    const data = await fetchContacts();
-    setContacts(data);
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading contacts...</div>
+      </div>
+    );
+  }
 
   const handleMarkRead = async (id) => {
     setLoading(true);

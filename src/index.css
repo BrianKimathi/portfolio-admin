@@ -1,2 +1,24 @@
 @import "tailwindcss";
  
+/* Beautiful loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.loading-spinner {
+  border: 6px solid #e0e7ef;
+  border-top: 6px solid #6366f1;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+.loading-text {
+  text-align: center;
+  color: #6366f1;
+  font-weight: 600;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}
+ 

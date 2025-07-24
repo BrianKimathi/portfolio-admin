@@ -11,10 +11,32 @@ const Dashboard = () => {
     projects_by_month: [],
     skills_by_month: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchStats().then(setStats);
+    const loadStats = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchStats();
+        setStats(data);
+      } catch (err) {
+        setError("Failed to load dashboard stats");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStats();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-full p-2 sm:p-4 md:p-6 lg:p-8 xl:p-10 2xl:p-12">

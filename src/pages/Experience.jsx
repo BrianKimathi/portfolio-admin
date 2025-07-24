@@ -18,18 +18,33 @@ const Experience = () => {
   const [form, setForm] = useState(initialForm);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    const loadExperience = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchExperience();
+        setExperience(data);
+      } catch (err) {
+        setError("Failed to load experience");
+      } finally {
+        setLoading(false);
+      }
+    };
     loadExperience();
   }, []);
 
-  const loadExperience = async () => {
-    const data = await fetchExperience();
-    setExperience(data);
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading experience...</div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

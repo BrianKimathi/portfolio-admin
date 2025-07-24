@@ -18,17 +18,32 @@ const Projects = () => {
   const [form, setForm] = useState(initialForm);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
+    const loadProjects = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchProjects();
+        setProjects(data);
+      } catch (err) {
+        setError("Failed to load projects");
+      } finally {
+        setLoading(false);
+      }
+    };
     loadProjects();
   }, []);
 
-  const loadProjects = async () => {
-    const data = await fetchProjects();
-    setProjects(data);
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="loading-spinner" />
+        <div className="loading-text">Loading projects...</div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
