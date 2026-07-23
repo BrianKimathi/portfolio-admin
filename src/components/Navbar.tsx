@@ -12,6 +12,7 @@ interface NavbarProps {
 const pageTitles: Record<string, string> = {
   dashboard: 'Dashboard',
   projects: 'Projects',
+  experience: 'Experience',
   skills: 'Skills',
   categories: 'Categories',
   contacts: 'Contacts',

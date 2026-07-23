@@ -14,6 +14,7 @@ export interface NavItem {
 const primaryNav: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Icons.DashboardIcon },
   { id: 'projects', label: 'Projects', icon: Icons.ProjectsIcon },
+  { id: 'experience', label: 'Experience', icon: Icons.BriefcaseIcon },
   { id: 'skills', label: 'Skills', icon: Icons.SkillsIcon },
   { id: 'categories', label: 'Categories', icon: Icons.FolderIcon },
   { id: 'contacts', label: 'Contacts', icon: Icons.ContactsIcon },

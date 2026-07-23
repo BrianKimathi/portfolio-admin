@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
+import Experience from './pages/Experience'
 import Skills from './pages/Skills'
 import Categories from './pages/Categories'
 import Contacts from './pages/Contacts'
@@ -58,6 +59,7 @@ export default function App() {
   const pages: Record<string, (props?: Props) => React.ReactNode> = {
     dashboard: () => <Dashboard />,
     projects: () => <Projects />,
+    experience: () => <Experience />,
     skills: (p) => <Skills categoryFilter={p?.categoryFilter} onClearFilter={p?.onClearCategoryFilter} />,
     categories: () => <Categories />,
     contacts: () => <Contacts />,
