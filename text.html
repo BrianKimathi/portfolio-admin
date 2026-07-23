@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hanging Navbar</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        background: linear-gradient(180deg, #dfe6f0, #c9d4e4);
+        font-family: "Segoe UI", system-ui, sans-serif;
+        overflow-x: hidden;
+      }
+
+      /* Ceiling strip the strings hang from */
+      .ceiling {
+        height: 14px;
+        background: linear-gradient(180deg, #4a4f5a, #2c2f36);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+      }
+
+      /* Wrapper: navbar not touching the screen edges */
+      .hanger {
+        position: relative;
+        width: min(880px, 80%);
+        margin: 0 auto;
+      }
+
+      .hanger svg {
+        position: absolute;
+        inset: 0;
+        overflow: visible;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      .navbar {
+        margin-top: 90px; /* string length */
+        background: linear-gradient(180deg, #ffffff, #eef1f6);
+        border: 1px solid #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 14px 30px rgba(30, 40, 70, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 56px;
+        will-change: transform;
+        cursor: pointer;
+      }
+
+      .brand {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: #2b3350;
+        letter-spacing: 0.5px;
+      }
+      .brand span {
+        color: #5b7cfa;
+      }
+
+      .links {
+        display: flex;
+        gap: 8px;
+        list-style: none;
+      }
+      .links a {
+        text-decoration: none;
+        color: #3c465f;
+        font-weight: 600;
+        font-size: 0.92rem;
+        padding: 8px 14px;
+        border-radius: 8px;
+        transition:
+          background 0.25s,
+          color 0.25s;
+      }
+      .links a:hover {
+        background: #5b7cfa;
+        color: #fff;
+      }
+
+      .content {
+        text-align: center;
+        margin-top: 90px;
+        color: #4a5570;
+      }
+      .content p {
+        opacity: 0.7;
+        margin-top: 8px;
+      }
+
+      @media (max-width: 620px) {
+        .navbar {
+          padding: 14px 44px;
+        }
+        .links a {
+          padding: 6px 8px;
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ceiling"></div>
+
+    <div class="hanger" id="hanger">
+      <svg id="rig"></svg>
+      <nav class="navbar" id="navbar">
+        <div class="brand">Swing<span>Nav</span></div>
+        <ul class="links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Work</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="content">
+      <h1>Pass your mouse over the navbar</h1>
+      <p>
+        It swings on its strings — and the strings stay threaded and wobbly.
+      </p>
+    </div>
+
+    <script>
+      const hanger = document.getElementById("hanger");
+      const navbar = document.getElementById("navbar");
+      const svg = document.getElementById("rig");
+      const NS = "[w3.org](http://www.w3.org/2000/svg)";
+
+      // Geometry
+      const STRING_LEN = 90; // ceiling to navbar top
+      const HOLE_X = 30; // hole inset from navbar corner
+      const HOLE_Y = 17; // hole distance from navbar top edge
+      const HOLE_R = 5.5;
+      const KNOT_DROP = 12;
+
+      // Pendulum physics
+      let angle = 0,
+        vel = 0,
+        energy = 0;
+      const STIFFNESS = 6.0,
+        DAMPING = 1.1;
+
+      let W = 0,
+        H = 0;
+
+      // Build SVG parts per side: dark hole -> string -> eyelet ring -> knot
+      function makeSide() {
+        const hole = document.createElementNS(NS, "circle");
+        const string = document.createElementNS(NS, "path");
+        const ring = document.createElementNS(NS, "circle");
+        const knot = document.createElementNS(NS, "circle");
+
+        hole.setAttribute("r", HOLE_R);
+        hole.setAttribute("fill", "#20242e");
+
+        string.setAttribute("fill", "none");
+        string.setAttribute("stroke", "#8a5a33");
+        string.setAttribute("stroke-width", "3");
+        string.setAttribute("stroke-linecap", "round");
+
+        ring.setAttribute("r", HOLE_R + 1.5);
+        ring.setAttribute("fill", "none");
+        ring.setAttribute("stroke", "#9aa3b5");
+        ring.setAttribute("stroke-width", "3");
+
+        knot.setAttribute("r", 4.5);
+        knot.setAttribute("fill", "#6e4526");
+
+        [hole, string, ring, knot].forEach((el) => svg.appendChild(el));
+        return { hole, string, ring, knot };
+      }
+
+      const left = makeSide(),
+        right = makeSide();
+
+      function resize() {
+        W = hanger.clientWidth;
+        H = STRING_LEN + navbar.offsetHeight;
+        svg.setAttribute("width", W);
+        svg.setAttribute("height", H);
+        svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+        // Pivot at the ceiling, centered above the bar
+        navbar.style.transformOrigin = `50% ${-STRING_LEN}px`;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      // Rotate a point around the pivot (W/2, 0)
+      function rotatePoint(x, y, a) {
+        const cx = W / 2,
+          s = Math.sin(a),
+          c = Math.cos(a);
+        const dx = x - cx,
+          dy = y;
+        return [cx + dx * c - dy * s, dx * s + dy * c];
+      }
+
+      function drawSide(side, anchorX, restHoleX, t, phase) {
+        // Hole & knot positions follow the rotated navbar exactly -> never detaches
+        const [hx, hy] = rotatePoint(restHoleX, STRING_LEN + HOLE_Y, angle);
+        const kOff = [
+          -KNOT_DROP * Math.sin(angle),
+          KNOT_DROP * Math.cos(angle),
+        ];
+        const kx = hx + kOff[0],
+          ky = hy + kOff[1];
+
+        // Wobble: idle shimmer + burst on movement + lag opposite to swing velocity
+        const amp = 2 + Math.min(26, energy * 60);
+        const lag = Math.max(-22, Math.min(22, -vel * 55));
+        const o1 = amp * Math.sin(t * 7 + phase) + lag * 0.6;
+        const o2 = -amp * Math.sin(t * 7 + phase + 0.9) + lag;
+
+        const y1 = hy * 0.35,
+          y2 = hy * 0.7;
+        // String curves down, passes through the hole, ends at the knot
+        side.string.setAttribute(
+          "d",
+          `M ${anchorX} 0
+       C ${anchorX + o1} ${y1}, ${hx + o2} ${y2}, ${hx} ${hy}
+       L ${kx} ${ky}`,
+        );
+
+        side.hole.setAttribute("cx", hx);
+        side.hole.setAttribute("cy", hy);
+        side.ring.setAttribute("cx", hx);
+        side.ring.setAttribute("cy", hy);
+        side.knot.setAttribute("cx", kx);
+        side.knot.setAttribute("cy", ky);
+      }
+
+      let last = performance.now();
+      function loop(now) {
+        const dt = Math.min(0.032, (now - last) / 1000);
+        last = now;
+        const t = now / 1000;
+
+        // Damped pendulum
+        const acc = -STIFFNESS * angle - DAMPING * vel;
+        vel += acc * dt;
+        angle += vel * dt;
+        energy = Math.max(Math.abs(vel), energy * 0.96); // wobble decays smoothly
+
+        navbar.style.transform = `rotate(${angle}rad)`;
+
+        drawSide(left, HOLE_X, HOLE_X, t, 0);
+        drawSide(right, W - HOLE_X, W - HOLE_X, t, 2.1);
+
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+
+      // Mouse pass -> push the bar away from the entry side
+      navbar.addEventListener("mouseenter", (e) => {
+        const rect = navbar.getBoundingClientRect();
+        const fromLeft = e.clientX < rect.left + rect.width / 2;
+        vel += fromLeft ? 0.55 : -0.55;
+        energy = Math.max(energy, 0.4);
+      });
+    </script>
+  </body>
+</html>
