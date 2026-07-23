@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
 import Skills from './pages/Skills'
+import Categories from './pages/Categories'
 import Contacts from './pages/Contacts'
 import Messages from './pages/Messages'
 import PersonalInfo from './pages/PersonalInfo'
@@ -58,6 +59,7 @@ export default function App() {
     dashboard: () => <Dashboard />,
     projects: () => <Projects />,
     skills: (p) => <Skills categoryFilter={p?.categoryFilter} onClearFilter={p?.onClearCategoryFilter} />,
+    categories: () => <Categories />,
     contacts: () => <Contacts />,
     messages: () => <Messages />,
     personal: () => <PersonalInfo />,

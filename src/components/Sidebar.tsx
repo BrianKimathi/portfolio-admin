@@ -15,6 +15,7 @@ const primaryNav: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: Icons.DashboardIcon },
   { id: 'projects', label: 'Projects', icon: Icons.ProjectsIcon },
   { id: 'skills', label: 'Skills', icon: Icons.SkillsIcon },
+  { id: 'categories', label: 'Categories', icon: Icons.FolderIcon },
   { id: 'contacts', label: 'Contacts', icon: Icons.ContactsIcon },
   { id: 'messages', label: 'Messages', icon: Icons.MessagesIcon },
 ]
@@ -151,9 +152,12 @@ export default function Sidebar({ isOpen, onClose, activeSection, onNavigate, on
           {categories.length > 0 && (
             <>
               <div className="mb-1.5 flex items-center justify-between px-3">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+                <button
+                  onClick={() => { handleNav('categories') }}
+                  className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                >
                   Skill Categories
-                </span>
+                </button>
                 <button
                   onClick={() => { resetCatForm(); setShowCatModal(true) }}
                   className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)]"
@@ -205,9 +209,12 @@ export default function Sidebar({ isOpen, onClose, activeSection, onNavigate, on
           {categories.length === 0 && (
             <div className="mb-3 px-3">
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
+                <button
+                  onClick={() => { handleNav('categories') }}
+                  className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                >
                   Skill Categories
-                </span>
+                </button>
                 <button
                   onClick={() => { resetCatForm(); setShowCatModal(true) }}
                   className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)]"

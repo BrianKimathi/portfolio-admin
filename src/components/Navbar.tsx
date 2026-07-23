@@ -13,6 +13,7 @@ const pageTitles: Record<string, string> = {
   dashboard: 'Dashboard',
   projects: 'Projects',
   skills: 'Skills',
+  categories: 'Categories',
   contacts: 'Contacts',
   messages: 'Messages',
   personal: 'Personal Info',
